@@ -1,22 +1,19 @@
-import 'dart:ui';
-
 import 'package:mobx/mobx.dart';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:validators2/validators.dart';
 
 part 'form_store.g.dart';
 
-class CustomColor extends Color {
-  CustomColor(int value) : super(value);
-}
+// class CustomColor extends Color {
+//   CustomColor(int value) : super(value);
+// }
 
 class FormStore = _FormStore with _$FormStore;
 
 abstract class _FormStore with Store {
   final FormErrorState error = FormErrorState();
 
-  @observable
-  CustomColor color = CustomColor(0);
+  // @observable
+  // CustomColor color = CustomColor(0);
 
   @observable
   String name = '';
@@ -40,37 +37,19 @@ abstract class _FormStore with Store {
 
   void setupValidations() {
     _disposers = [
-      reaction((_) => name, validateUsername),
       reaction((_) => email, validateEmail),
       reaction((_) => password, validatePassword),
+      reaction((_) => name, validateUsername),
     ];
   }
 
+  void dispose() {
+    for (final d in _disposers) d();
+  }
+
   @action
-  // ignore: avoid_void_async
-  Future validateUsername(String value) async {
-    value = value.trim();
-
-    if (isNull(value) || value.isEmpty) {
-      error.username = 'Cannot be blank';
-      return;
-    }
-
-    try {
-      usernameCheck = ObservableFuture(checkValidUsername(value));
-
-      error.username = null;
-
-      final isValid = await usernameCheck;
-      if (!isValid) {
-        error.username = 'Username cannot be "admin"';
-        return;
-      }
-    } on Object catch (_) {
-      error.username = null;
-    }
-
-    error.username = null;
+  void validateEmail(String value) {
+    error.email = isEmail(value.trim()) ? null : 'Not a valid email';
   }
 
   @action
@@ -84,8 +63,25 @@ abstract class _FormStore with Store {
   }
 
   @action
-  void validateEmail(String value) {
-    error.email = isEmail(value.trim()) ? null : 'Not a valid email';
+  Future validateUsername(String value) async {
+    error.username = null;
+
+    if (isNull(value) || value.trim().isEmpty) {
+      error.username = 'Cannot be blank';
+      return;
+    }
+
+    try {
+      usernameCheck = ObservableFuture(checkValidUsername(value));
+
+      final isValid = await usernameCheck;
+      if (!isValid) {
+        error.username = 'Username cannot be "admin"';
+        return;
+      }
+    } on Object catch (_) {
+      error.username = 'Server validation is broken';
+    }
   }
 
   Future<bool> checkValidUsername(String value) async {
@@ -93,14 +89,10 @@ abstract class _FormStore with Store {
     return value != 'admin';
   }
 
-  void dispose() {
-    for (final d in _disposers) d();
-  }
-
   Future<bool> validateAll() async {
     await validateUsername(name);
-    validatePassword(password);
     validateEmail(email);
+    validatePassword(password);
     return canLogin;
   }
 }

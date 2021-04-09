@@ -23,21 +23,6 @@ mixin _$FormStore on _FormStore, Store {
           Computed<bool>(() => super.canLogin, name: '_FormStore.canLogin'))
       .value;
 
-  final _$colorAtom = Atom(name: '_FormStore.color');
-
-  @override
-  CustomColor get color {
-    _$colorAtom.reportRead();
-    return super.color;
-  }
-
-  @override
-  set color(CustomColor value) {
-    _$colorAtom.reportWrite(value, super.color, () {
-      super.color = value;
-    });
-  }
-
   final _$nameAtom = Atom(name: '_FormStore.name');
 
   @override
@@ -110,17 +95,6 @@ mixin _$FormStore on _FormStore, Store {
   final _$_FormStoreActionController = ActionController(name: '_FormStore');
 
   @override
-  void validatePassword(String value) {
-    final _$actionInfo = _$_FormStoreActionController.startAction(
-        name: '_FormStore.validatePassword');
-    try {
-      return super.validatePassword(value);
-    } finally {
-      _$_FormStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void validateEmail(String value) {
     final _$actionInfo = _$_FormStoreActionController.startAction(
         name: '_FormStore.validateEmail');
@@ -132,9 +106,19 @@ mixin _$FormStore on _FormStore, Store {
   }
 
   @override
+  void validatePassword(String value) {
+    final _$actionInfo = _$_FormStoreActionController.startAction(
+        name: '_FormStore.validatePassword');
+    try {
+      return super.validatePassword(value);
+    } finally {
+      _$_FormStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-color: ${color},
 name: ${name},
 email: ${email},
 password: ${password},

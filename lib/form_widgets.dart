@@ -45,10 +45,11 @@ class _FormExampleState extends State<FormExample> {
                   ),
                 ),
                 Observer(
-                    builder: (_) => AnimatedOpacity(
-                        child: const LinearProgressIndicator(),
-                        duration: const Duration(milliseconds: 300),
-                        opacity: store.isUserCheckPending ? 1 : 0)),
+                  builder: (_) => AnimatedOpacity(
+                      child: const LinearProgressIndicator(),
+                      duration: const Duration(milliseconds: 300),
+                      opacity: store.isUserCheckPending ? 1 : 0),
+                ),
                 Observer(
                   builder: (_) => TextField(
                     onChanged: (value) => store.email = value,
@@ -60,6 +61,7 @@ class _FormExampleState extends State<FormExample> {
                 ),
                 Observer(
                   builder: (_) => TextField(
+                    obscureText: true,
                     onChanged: (value) => store.password = value,
                     decoration: InputDecoration(
                         labelText: 'Password',
